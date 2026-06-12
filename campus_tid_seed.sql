@@ -6,6 +6,10 @@ SET FOREIGN_KEY_CHECKS = 0;
 CREATE DATABASE IF NOT EXISTS `campus_tid` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `campus_tid`;
 
+DELETE FROM `announcement_reads`;
+DELETE FROM `direct_messages`;
+DELETE FROM `forum_comments`;
+DELETE FROM `forum_threads`;
 DELETE FROM `attendance`;
 DELETE FROM `grades`;
 DELETE FROM `enrollments`;
@@ -14,6 +18,10 @@ DELETE FROM `courses`;
 DELETE FROM `categories`;
 DELETE FROM `users`;
 
+ALTER TABLE `announcement_reads` AUTO_INCREMENT = 1;
+ALTER TABLE `direct_messages` AUTO_INCREMENT = 1;
+ALTER TABLE `forum_comments` AUTO_INCREMENT = 1;
+ALTER TABLE `forum_threads` AUTO_INCREMENT = 1;
 ALTER TABLE `attendance` AUTO_INCREMENT = 1;
 ALTER TABLE `grades` AUTO_INCREMENT = 1;
 ALTER TABLE `enrollments` AUTO_INCREMENT = 1;
@@ -64,15 +72,33 @@ INSERT INTO `courses` (`id`, `active`, `capacity`, `description`, `end_date`, `s
 (11, b'1', 18, 'Propuesta de valor, prototipo, MVP y presentacion de pitch.', '2026-06-30', '2026-05-16', 'Emprendimiento: MVP y Pitch', 6),
 (12, b'0', 30, 'Segmentacion, anuncios, presupuesto y medicion de resultados.', '2026-05-31', '2026-05-01', 'Publicidad en Redes Sociales', 3);
 
-INSERT INTO `announcements` (`id`, `content`, `created_at`, `date`, `title`) VALUES
-(1, 'Bienvenido(a) al campus. Revisa tus cursos y completa tu perfil.', '2026-05-01 08:30:00.000000', '2026-05-01', 'Bienvenida'),
-(2, 'Ya estan disponibles los nuevos cursos de programacion y diseno.', '2026-05-02 09:00:00.000000', '2026-05-02', 'Nuevos cursos'),
-(3, 'Recuerda actualizar tu informacion de contacto para recibir notificaciones.', '2026-05-03 10:15:00.000000', '2026-05-03', 'Actualiza tu perfil'),
-(4, 'Semana de induccion: participa en las sesiones de herramientas y plataformas.', '2026-05-04 07:45:00.000000', '2026-05-04', 'Induccion'),
-(5, 'Se habilitaron cupos adicionales en Git y GitHub Flujo de Trabajo.', '2026-05-06 12:05:00.000000', '2026-05-06', 'Cupos disponibles'),
-(6, 'Entrega de la primera actividad en JavaScript Basico: fecha limite 2026-05-18.', '2026-05-10 08:10:00.000000', '2026-05-10', 'Actividad 1'),
-(7, 'Taller de SQL: practica joins y normalizacion con ejercicios guiados.', '2026-05-12 09:20:00.000000', '2026-05-12', 'Taller SQL'),
-(8, 'Charla de emprendimiento: valida tu idea y define tu MVP.', '2026-05-15 11:00:00.000000', '2026-05-15', 'Charla MVP');
+INSERT INTO `announcements` (`id`, `author`, `content`, `created_at`, `date`, `info_url`, `priority`, `title`) VALUES
+(1, 'Administracion', 'Bienvenido(a) al campus. Revisa tus cursos y completa tu perfil.', '2026-05-01 08:30:00.000000', '2026-05-01', NULL, 'Alta', 'Bienvenida'),
+(2, 'Coordinacion Academica', 'Ya estan disponibles los nuevos cursos de programacion y diseno.', '2026-05-02 09:00:00.000000', '2026-05-02', NULL, 'Media', 'Nuevos cursos'),
+(3, 'Soporte Campus', 'Recuerda actualizar tu informacion de contacto para recibir notificaciones.', '2026-05-03 10:15:00.000000', '2026-05-03', NULL, 'Media', 'Actualiza tu perfil'),
+(4, 'Bienestar', 'Semana de induccion: participa en las sesiones de herramientas y plataformas.', '2026-05-04 07:45:00.000000', '2026-05-04', NULL, 'Alta', 'Induccion'),
+(5, 'Coordinacion Academica', 'Se habilitaron cupos adicionales en Git y GitHub Flujo de Trabajo.', '2026-05-06 12:05:00.000000', '2026-05-06', NULL, 'Media', 'Cupos disponibles'),
+(6, 'Ana Gomez', 'Entrega de la primera actividad en JavaScript Basico: fecha limite 2026-05-18.', '2026-05-10 08:10:00.000000', '2026-05-10', NULL, 'Alta', 'Actividad 1'),
+(7, 'Laura Diaz', 'Taller de SQL: practica joins y normalizacion con ejercicios guiados.', '2026-05-12 09:20:00.000000', '2026-05-12', NULL, 'Media', 'Taller SQL'),
+(8, 'Felipe Moreno', 'Charla de emprendimiento: valida tu idea y define tu MVP.', '2026-05-15 11:00:00.000000', '2026-05-15', NULL, 'Baja', 'Charla MVP');
+
+INSERT INTO `announcement_reads` (`id`, `read_at`, `announcement_id`, `user_id`) VALUES
+(1, '2026-05-16 09:10:00.000000', 1, 1),
+(2, '2026-05-16 09:12:00.000000', 2, 1);
+
+INSERT INTO `forum_threads` (`id`, `category`, `created_at`, `title`, `votes`, `author_id`) VALUES
+(1, 'React', '2026-05-12 14:00:00.000000', 'Como estructurar rutas complejas en React Router v6', 24, 2),
+(2, 'Seguridad', '2026-05-13 16:30:00.000000', 'Mejores practicas para asegurar microservicios en Java Spring Boot', 18, 13);
+
+INSERT INTO `forum_comments` (`id`, `content`, `created_at`, `author_id`, `thread_id`) VALUES
+(1, 'Yo utilizo loaders por modulo para separar responsabilidades y mantener las rutas legibles.', '2026-05-12 14:15:00.000000', 3, 1),
+(2, 'Tambien ayuda agrupar rutas privadas debajo de un layout que valide sesion.', '2026-05-12 15:00:00.000000', 5, 1),
+(3, 'Recomiendo validar entradas, centralizar CORS y usar roles por endpoint desde el inicio.', '2026-05-13 17:00:00.000000', 15, 2);
+
+INSERT INTO `direct_messages` (`id`, `content`, `sent_at`, `receiver_id`, `sender_id`) VALUES
+(1, 'Hola, pudiste revisar el modulo de seguridad?', '2026-05-14 09:00:00.000000', 1, 2),
+(2, 'Hola profe, si, justo estoy revisando la integracion con el backend.', '2026-05-14 09:05:00.000000', 2, 1),
+(3, 'Me pasas el enlace del repositorio cuando puedas?', '2026-05-15 10:20:00.000000', 1, 3);
 
 INSERT INTO `enrollments` (`id`, `enrolled_at`, `status`, `course_id`, `user_id`) VALUES
 (1, '2026-05-09 14:15:00.000000', 'INSCRITO', 1, 1),

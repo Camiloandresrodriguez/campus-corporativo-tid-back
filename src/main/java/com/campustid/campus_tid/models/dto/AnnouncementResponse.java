@@ -8,5 +8,9 @@ public record AnnouncementResponse(
 	String title,
 	String content,
 	LocalDate date,
-	Instant createdAt
+	Instant createdAt,
+	String priority,
+	String author,
+	String infoUrl,
+	boolean read
 ) {}

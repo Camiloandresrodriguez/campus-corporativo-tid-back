@@ -11,5 +11,6 @@ public record CourseResponse(
 	LocalDate startDate,
 	LocalDate endDate,
 	Integer capacity,
-	boolean active
+	boolean active,
+	Long enrolledCount
 ) {}

@@ -30,6 +30,15 @@ public class AnnouncementEntity {
 	@Column(nullable = false)
 	private Instant createdAt;
 
+	@Column(nullable = false, length = 20)
+	private String priority = "Media";
+
+	@Column(nullable = false, length = 120)
+	private String author = "Administración";
+
+	@Column(length = 500)
+	private String infoUrl;
+
 	@PrePersist
 	void prePersist() {
 		this.createdAt = Instant.now();
@@ -72,5 +81,29 @@ public class AnnouncementEntity {
 
 	public Instant getCreatedAt() {
 		return createdAt;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public String getInfoUrl() {
+		return infoUrl;
+	}
+
+	public void setInfoUrl(String infoUrl) {
+		this.infoUrl = infoUrl;
 	}
 }
