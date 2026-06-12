@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,13 +28,13 @@ public class AnnouncementsController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<AnnouncementResponse>> list() {
-		return ResponseEntity.ok(announcementService.list());
+	public ResponseEntity<List<AnnouncementResponse>> list(@RequestParam(required = false) Long userId) {
+		return ResponseEntity.ok(announcementService.list(userId));
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<AnnouncementResponse> get(@PathVariable Long id) {
-		return ResponseEntity.ok(announcementService.get(id));
+	public ResponseEntity<AnnouncementResponse> get(@PathVariable Long id, @RequestParam(required = false) Long userId) {
+		return ResponseEntity.ok(announcementService.get(id, userId));
 	}
 
 	@PostMapping
@@ -52,6 +53,12 @@ public class AnnouncementsController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		announcementService.delete(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/{id}/read")
+	public ResponseEntity<Void> markRead(@PathVariable Long id, @RequestParam Long userId) {
+		announcementService.markRead(id, userId);
 		return ResponseEntity.noContent().build();
 	}
 }

@@ -8,5 +8,8 @@ import java.time.LocalDate;
 public record AnnouncementUpsertRequest(
 	@NotBlank @Size(max = 200) String title,
 	@NotBlank @Size(max = 4000) String content,
-	@NotNull LocalDate date
+	@NotNull LocalDate date,
+	@Size(max = 20) String priority,
+	@Size(max = 120) String author,
+	@Size(max = 500) String infoUrl
 ) {}

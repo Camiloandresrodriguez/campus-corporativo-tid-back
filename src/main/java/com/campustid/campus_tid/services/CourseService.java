@@ -5,6 +5,7 @@ import com.campustid.campus_tid.models.CourseEntity;
 import com.campustid.campus_tid.models.dto.CourseResponse;
 import com.campustid.campus_tid.models.dto.CourseUpsertRequest;
 import com.campustid.campus_tid.repositories.CourseRepository;
+import com.campustid.campus_tid.repositories.EnrollmentRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,35 +15,41 @@ public class CourseService {
 
 	private final CourseRepository courseRepository;
 	private final CategoryService categoryService;
+	private final EnrollmentRepository enrollmentRepository;
 
-	public CourseService(CourseRepository courseRepository, CategoryService categoryService) {
+	public CourseService(
+		CourseRepository courseRepository,
+		CategoryService categoryService,
+		EnrollmentRepository enrollmentRepository
+	) {
 		this.courseRepository = courseRepository;
 		this.categoryService = categoryService;
+		this.enrollmentRepository = enrollmentRepository;
 	}
 
 	@Transactional(readOnly = true)
 	public List<CourseResponse> list(Long categoryId) {
 		var courses = categoryId == null ? courseRepository.findAll() : courseRepository.findByCategoryId(categoryId);
-		return courses.stream().map(CourseService::toResponse).toList();
+		return courses.stream().map(this::toResponseWithCounts).toList();
 	}
 
 	@Transactional(readOnly = true)
 	public CourseResponse get(Long id) {
-		return toResponse(findEntity(id));
+		return toResponseWithCounts(findEntity(id));
 	}
 
 	@Transactional
 	public CourseResponse create(CourseUpsertRequest req) {
 		var c = new CourseEntity();
 		apply(c, req);
-		return toResponse(courseRepository.save(c));
+		return toResponseWithCounts(courseRepository.save(c));
 	}
 
 	@Transactional
 	public CourseResponse update(Long id, CourseUpsertRequest req) {
 		var c = findEntity(id);
 		apply(c, req);
-		return toResponse(courseRepository.save(c));
+		return toResponseWithCounts(courseRepository.save(c));
 	}
 
 	@Transactional
@@ -70,7 +77,15 @@ public class CourseService {
 		}
 	}
 
+	private CourseResponse toResponseWithCounts(CourseEntity c) {
+		return toResponse(c, enrollmentRepository.countByCourseId(c.getId()));
+	}
+
 	public static CourseResponse toResponse(CourseEntity c) {
+		return toResponse(c, null);
+	}
+
+	public static CourseResponse toResponse(CourseEntity c, Long enrolledCount) {
 		return new CourseResponse(
 			c.getId(),
 			c.getTitle(),
@@ -80,7 +95,8 @@ public class CourseService {
 			c.getStartDate(),
 			c.getEndDate(),
 			c.getCapacity(),
-			c.isActive()
+			c.isActive(),
+			enrolledCount
 		);
 	}
 }

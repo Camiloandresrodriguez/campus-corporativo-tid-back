@@ -29,10 +29,26 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `announcements` (
   `id` bigint(20) NOT NULL,
+  `author` varchar(120) NOT NULL DEFAULT 'Administracion',
   `content` varchar(4000) NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `date` date NOT NULL,
+  `info_url` varchar(500) DEFAULT NULL,
+  `priority` varchar(20) NOT NULL DEFAULT 'Media',
   `title` varchar(200) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `announcement_reads`
+--
+
+CREATE TABLE `announcement_reads` (
+  `id` bigint(20) NOT NULL,
+  `read_at` datetime(6) NOT NULL,
+  `announcement_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -94,6 +110,49 @@ CREATE TABLE `enrollments` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `direct_messages`
+--
+
+CREATE TABLE `direct_messages` (
+  `id` bigint(20) NOT NULL,
+  `content` varchar(4000) NOT NULL,
+  `sent_at` datetime(6) NOT NULL,
+  `receiver_id` bigint(20) NOT NULL,
+  `sender_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `forum_threads`
+--
+
+CREATE TABLE `forum_threads` (
+  `id` bigint(20) NOT NULL,
+  `category` varchar(80) NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `title` varchar(220) NOT NULL,
+  `votes` int(11) NOT NULL,
+  `author_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `forum_comments`
+--
+
+CREATE TABLE `forum_comments` (
+  `id` bigint(20) NOT NULL,
+  `content` varchar(4000) NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `author_id` bigint(20) NOT NULL,
+  `thread_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `grades`
 --
 
@@ -144,6 +203,14 @@ ALTER TABLE `announcements`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `announcement_reads`
+--
+ALTER TABLE `announcement_reads`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uk_announcement_reads_user_announcement` (`user_id`,`announcement_id`),
+  ADD KEY `FK_announcement_reads_announcement` (`announcement_id`);
+
+--
 -- Indices de la tabla `attendance`
 --
 ALTER TABLE `attendance`
@@ -182,6 +249,29 @@ ALTER TABLE `grades`
   ADD KEY `FKk2mjfajsa87cdrrjlyqt7tsm2` (`user_id`);
 
 --
+-- Indices de la tabla `direct_messages`
+--
+ALTER TABLE `direct_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_direct_messages_sender` (`sender_id`),
+  ADD KEY `FK_direct_messages_receiver` (`receiver_id`);
+
+--
+-- Indices de la tabla `forum_threads`
+--
+ALTER TABLE `forum_threads`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_forum_threads_author` (`author_id`);
+
+--
+-- Indices de la tabla `forum_comments`
+--
+ALTER TABLE `forum_comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_forum_comments_author` (`author_id`),
+  ADD KEY `FK_forum_comments_thread` (`thread_id`);
+
+--
 -- Indices de la tabla `users`
 --
 ALTER TABLE `users`
@@ -196,6 +286,12 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `announcements`
 --
 ALTER TABLE `announcements`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `announcement_reads`
+--
+ALTER TABLE `announcement_reads`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
@@ -229,6 +325,24 @@ ALTER TABLE `grades`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `direct_messages`
+--
+ALTER TABLE `direct_messages`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `forum_threads`
+--
+ALTER TABLE `forum_threads`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `forum_comments`
+--
+ALTER TABLE `forum_comments`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
@@ -237,6 +351,13 @@ ALTER TABLE `users`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `announcement_reads`
+--
+ALTER TABLE `announcement_reads`
+  ADD CONSTRAINT `FK_announcement_reads_announcement` FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_announcement_reads_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `attendance`
@@ -264,6 +385,26 @@ ALTER TABLE `enrollments`
 ALTER TABLE `grades`
   ADD CONSTRAINT `FKk2mjfajsa87cdrrjlyqt7tsm2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `FKox7bxu57m6gpmeeyj38rfrdw9` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`);
+
+--
+-- Filtros para la tabla `direct_messages`
+--
+ALTER TABLE `direct_messages`
+  ADD CONSTRAINT `FK_direct_messages_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_direct_messages_sender` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `forum_threads`
+--
+ALTER TABLE `forum_threads`
+  ADD CONSTRAINT `FK_forum_threads_author` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `forum_comments`
+--
+ALTER TABLE `forum_comments`
+  ADD CONSTRAINT `FK_forum_comments_author` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_forum_comments_thread` FOREIGN KEY (`thread_id`) REFERENCES `forum_threads` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
